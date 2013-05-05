@@ -52,12 +52,12 @@ class ChatHandler {
       webSocketConnections.forEach((connection) {
         if (conn != connection) {
           print('queued msg to be sent');
-          queue(() => connection.send(message));
+          queue(() => connection.add(message));
         }
       });
       time('send to isolate', () => log.log(message));
     }
-    
+
     print('new ws conn');
     webSocketConnections.add(conn);
     conn.listen(onMessage,
@@ -70,11 +70,11 @@ class ChatHandler {
 runServer(String basePath, int port) {
   ChatHandler chatHandler = new ChatHandler(basePath);
   StaticFileHandler fileHandler = new StaticFileHandler(basePath);
-  
+
   HttpServer.bind('127.0.0.1', port)
     .then((HttpServer server) {
       print('listening for connections on $port');
-      
+
       var sc = new StreamController();
       sc.stream.transform(new WebSocketTransformer()).listen(chatHandler.onConnection);
 
